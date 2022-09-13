@@ -1,17 +1,25 @@
-import logo from './logo.svg';
 import './App.css';
+import { gql, useSubscription } from "@apollo/client";
+import LikeCountComponent from "./components/likeCount";
 
-
-const movies = [
-  {
-    name: 'Snatch',
-    img: 'https://occ-0-3934-3211.1.nflxso.net/dnm/api/v6/E8vDc_W8CLv7-yMQu8KMEC7Rrr8/AAAABVJgO06RKuruJpcyezdM43Ai2ZjvNDmtbnwUXVtvXVhhvpL0tvhr4s9e3j8UojFCLao5a7v8Dg5kti1vFKcA0ldZXWnnC03nBRIt.jpg?r=cbf',
-    likes: 10,
-    state: true,
+const GET_MOVIES = gql`
+  subscription {
+    movies {
+      id
+      created_at
+      name
+      image
+    }
   }
-];
+`;
+
+
 
 function App() {
+  const { data, loading } = useSubscription(GET_MOVIES);
+  if (loading) {
+    return <div>Loading</div>;
+  }
   return (
     <div className="App">
       <header className="App-header">
@@ -20,21 +28,22 @@ function App() {
         </p>
       </header>
       {
-        movies.map(movie => {
+        data && data.movies && data.movies.length ?
+        data.movies.map((movie, index) => {
           return (
-              <div className="movie-box">
+              <div className="movie-box" key={index}>
                 <div className="movie-box-header">
                 </div>
                 <div className="movie-box-body">
-                  <img alt={movie.name} className="movie-image" src={movie.img} />
+                  <img alt={movie.name} className="movie-image" src={movie.image} />
                 </div>
                 <div className="movie-box-footer">
                   {movie.name}
-                  <div className="like-button"><i class="fa fa-heart" style={{"color": "red"}}aria-hidden="true"></i></div>
+                  <div className="like-button"><LikeCountComponent movie={movie} /></div>
                 </div>
               </div>
           )
-        })
+        }) : "No movies"
       }
     </div>
   );

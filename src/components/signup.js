@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from 'react-router-dom';
+import { auth } from "../utils/config";
+
 
 export default function Login(props) {
   const [email, setEmail] = useState("");
@@ -8,6 +10,16 @@ export default function Login(props) {
 
   async function handleSubmit(e) {
     e.preventDefault();
+
+    // login
+    try {
+      await auth.register({email, password});
+    } catch (error) {
+      alert("error logging in");
+      console.error(error);
+      return;
+    }
+
     navigate("/");
   }
 
@@ -27,7 +39,7 @@ export default function Login(props) {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <button>Signup</button>
+        <button>Login</button>
       </form>
     </div>
   );
